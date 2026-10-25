@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>海外快速访店稽核系统 V1.3</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f3ff',
+              100: '#e0e7ff',
+              600: '#3b82f6',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    
+    /* Print Optimized Styles */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        font-size: 12px !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .page-break-inside-avoid {
+        break-inside: avoid;
+      }
+      .card-shadow {
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      textarea {
+        border: none !important;
+        resize: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+      input[type="file"], label[for^="photo-"] {
+        display: none !important;
+      }
+      .photo-delete-btn {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-24 md:pb-12">
+
+  <!-- Sticky Header Bar -->
+  <header class="sticky top-0 z-40 bg-slate-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold text-lg leading-none">
+          <i class="fa-solid font-bold fa-clipboard-check"></i>
+        </div>
+        <div>
+          <h1 class="text-base md:text-lg font-bold leading-tight">海外快速访店稽核系统</h1>
+          <p class="text-xs text-slate-400">V1.3 完整35项标准版</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2 no-print">
+        <button onclick="resetForm()" class="px-3 py-1.5 text-xs md:text-sm bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition flex items-center space-x-1">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span class="hidden sm:inline">重置表格</span>
+        </button>
+        <button onclick="exportToPDF()" class="px-3 py-1.5 text-xs md:text-sm bg-amber-500 hover:bg-amber-600 font-semibold rounded-lg text-slate-900 transition flex items-center space-x-1 shadow">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>导出问题报告</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-2 sm:px-4 py-4 space-y-4">
+
+    <!-- Store & Audit Info Bar -->
+    <section class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 card-shadow">
+      <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center space-x-2 border-b pb-2">
+        <i class="fa-solid fa-store text-indigo-600"></i>
+        <span>门店及稽核基本信息</span>
+      </h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs md:text-sm">
+        <div>
+          <label class="block text-slate-500 mb-1 font-medium">门店名称</label>
+          <input type="text" id="storeName" value="Sandakan airport" placeholder="请输入门店名称" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1 font-medium">门店编码</label>
+          <input type="text" id="storeCode" value="MY-SDK-001" placeholder="请输入门店编码" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1 font-medium">稽核人员</label>
+          <input type="text" id="auditorName" value="Alex" placeholder="稽核人姓名" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-500 mb-1 font-medium">稽核日期</label>
+          <input type="date" id="auditDate" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+      </div>
+    </section>
+
+    <!-- Penalty Switch & Grade Indicator Dashboard -->
+    <section class="bg-amber-50 rounded-xl p-4 border border-amber-200 text-amber-900 card-shadow">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+        <div class="flex items-start space-x-2">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5"></i>
+          <div>
+            <h3 class="font-bold text-sm md:text-base">S级违规满分基数扣减设置 (S-Level Base Penalty Control)</h3>
+            <p class="text-xs text-amber-700">规则规定：当门店出现任意【S】关键项违规时，基础满分将自动从 150分 扣减 50分（即起步分降为 100分）。</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2 self-end md:self-center bg-white px-3 py-1.5 rounded-lg border border-amber-300 no-print">
+          <input type="checkbox" id="sPenaltyToggle" checked onchange="calculateScore()" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+          <label for="sPenaltyToggle" class="text-xs font-bold cursor-pointer select-none">启用 [S] 违规扣减50分</label>
+        </div>
+      </div>
+
+      <!-- Risk Grade Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-xs">
+        <div id="gradeBoxA" class="bg-emerald-100 border border-emerald-300 text-emerald-800 p-2 rounded-lg font-medium transition">
+          <div class="font-bold">Grade A (低风险)</div>
+          <div>130 ~ 150分 (无S/SS项违规)</div>
+        </div>
+        <div id="gradeBoxB" class="bg-blue-100 border border-blue-300 text-blue-800 p-2 rounded-lg font-medium transition">
+          <div class="font-bold">Grade B (中风险)</div>
+          <div>101 ~ 129分 (无S/SS项违规)</div>
+        </div>
+        <div id="gradeBoxC" class="bg-amber-100 border border-amber-300 text-amber-800 p-2 rounded-lg font-medium transition">
+          <div class="font-bold">Grade C (高风险)</div>
+          <div>71 ~ 100分 或 存在[S]项</div>
+        </div>
+        <div id="gradeBoxD" class="bg-rose-100 border border-rose-300 text-rose-800 p-2 rounded-lg font-medium transition">
+          <div class="font-bold">Grade D (极高风险)</div>
+          <div>≤70分 或 触发[SS]一票否决</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dynamic Audit Checklist Sections container -->
+    <div id="checklistContainer" class="space-y-4"></div>
+
+  </main>
+
+  <!-- Bottom Floating Summary Bar for Mobile -->
+  <div class="fixed bottom-0 left-0 right-0 bg-slate-900 text-white shadow-lg border-t border-slate-700 px-4 py-3 z-30 card-shadow">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm">
+        <div>
+          <span class="text-slate-400 block text-[10px] md:text-xs">有效满分</span>
+          <span id="effectiveMaxScore" class="font-bold text-sm md:text-lg">150</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px] md:text-xs">实际得分</span>
+          <span id="totalScoreDisplay" class="font-bold text-lg md:text-2xl text-amber-400">150</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px] md:text-xs">评级判定</span>
+          <span id="gradeBadge" class="inline-block px-2 py-0.5 text-xs font-bold rounded bg-emerald-500 text-white">Grade A</span>
+        </div>
+        <div class="hidden sm:block">
+          <span class="text-slate-400 block text-[10px] md:text-xs">SS一票否决</span>
+          <span id="ssViolationCount" class="font-bold text-rose-400">0 项</span>
+        </div>
+        <div class="hidden sm:block">
+          <span class="text-slate-400 block text-[10px] md:text-xs">S违规项</span>
+          <span id="sViolationCount" class="font-bold text-amber-400">0 项</span>
+        </div>
+      </div>
+
+      <button onclick="exportToPDF()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg text-xs md:text-sm flex items-center space-x-2 shadow transition">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>导出问题报告</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Set default audit date to today
+    document.getElementById('auditDate').valueAsDate = new Date();
+
+    // 35 Audit Items Data Definition
+    const auditData = [
+      {
+        sectionId: "A",
+        sectionTitle: "Section A: 顾客体验标准 Customer Experience Standards",
+        maxScore: 36,
+        items: [
+          { id: "A1", type: "S", title: "（S)严重卫生不良与凌乱 Severe Poor Sanitation", detail: "营业期间维持门店清洁\n1. 顾客可见区域存在垃圾、食物残渣、积水或异味\n2. 操作区原料与工具堆放严重无序", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A2", type: "S", title: "（S)核心体验 Core Experience", detail: "1. 顾客在吧台等待超过2分钟无人接待\n2. 播放未经品牌授权的音乐或广告", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A3", type: "S", title: "（S)营销与新品活动标准 Marketing & New Product Campaign", detail: "总部当前统一营销活动必须全面执行，不得擅自下架或不执行", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A4", type: "M", title: "（M）门头招牌与宣传物料标准 Store Signage & Materials", detail: "1. 主门头、侧招、灯箱不符合品牌要求\n2. 室内外张贴非标宣传物料", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A5", type: "M", title: "（M)吧台清洁标准 Bar Counter Cleanliness", detail: "吧台台面及设备保持干净无渍，地面无明显污垢或积水", defaultDeduction: -5, defaultRemark: "staff drink is on the bar" },
+          { id: "A6", type: "M", title: "（M)顾客服务标准 Customer Service Standards", detail: "1. 进店欢迎语与离店问候语执行\n2. 员工仪容仪表（工作服、口罩、发网完整规范）", defaultDeduction: -5, defaultRemark: "nobody said Thank you; didn't wear mask&uniform" },
+          { id: "A7", type: "N", title: "固定设施与大门配件标准 Fixed Facilities", detail: "固定设施完好，无损坏、剥落、生锈或松动", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A8", type: "N", title: "过季物料按要求下架撤除 Off-season Materials", detail: "过季联名商品及物料及时撤除，不陈列于顾客可见区", defaultDeduction: 0, defaultRemark: "" }
+        ]
+      },
+      {
+        sectionId: "B",
+        sectionTitle: "Section B: 食品安全标准 Food Safety Standards",
+        maxScore: 53,
+        items: [
+          { id: "B1", type: "S", title: "（S）净水系统过期 Expired Water Filtration System", detail: "未按要求更换净水系统滤芯（过期或缺少定期清洗记录）", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B2", type: "M", title: "（M）化学品与清洁用具标准 Chemical & Sanitizing Tools", detail: "1. 化学品单独存放\n2. 按要求配制消毒液\n3. 抹布分类管理", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B3", type: "M", title: "（M）洗手区 QSC 标准 Hand-Washing Area QSC", detail: "烘手器正常，配备充足洗手液，洗手池专池专用", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B4", type: "M", title: "（M）操作区卫生标准 Operation Area Sanitation", detail: "墙面、天花板、灭蝇灯、垃圾桶及地面无积垢积水", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B5", type: "M", title: "（M）食品设备与储存标准 Food Equipment & Storage", detail: "食品加工设备内外表面无污垢，冷藏冷冻食材常温放置不超过15分钟", defaultDeduction: -1, defaultRemark: "sealing machine is dirty, need to clean" },
+          { id: "B6", type: "M", title: "（M）制冰机 QSC 标准 Ice-Maker QSC Standards", detail: "制冰机盖及时关闭，冰铲单独存放，水槽内壁干净", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B7", type: "M", title: "（M）奶茶机/原料桶/冰箱 QSC 标准 Equipment & Ingredients", detail: "1. 设备设定温度符合标准(>8℃需注意)\n2. 效期标签正确张贴，原料在最佳赏味期内", defaultDeduction: -5, defaultRemark: "dahongpao tea, d milk, grape rose juice expired" },
+          { id: "B8", type: "M", title: "（M）煮制台 QSC 标准 Cooking Station QSC", detail: "开封常温原料在保质期内，搅拌器及工具清洁无垢", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B9", type: "M", title: "（M）水果台 QSC 标准 Fruit Station QSC", detail: "工具妥善存放，水龙头及水槽无顽固污渍，按SOP消毒水果", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B10", type: "M", title: "（M）冷藏原料储存标准 Refrigerated Storage", detail: "冷藏温度≤8℃，出风口及封条无霉变，生熟分类存放", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B11", type: "M", title: "（M）冷冻原料储存标准 Frozen Storage", detail: "冷冻温度≤-12℃，结霜不超过1cm，无反复解冻现象", defaultDeduction: 0, defaultRemark: "" }
+        ]
+      },
+      {
+        sectionId: "C",
+        sectionTitle: "Section C: 产品品质标准 Product Quality Standards",
+        maxScore: 43,
+        items: [
+          { id: "C1", type: "SS", title: "（SS）擅自采购非品牌授权原料/物料 Unauthorized Materials", detail: "门店发现未经品牌授权的原物料或包装物料（一票否决项）", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C2", type: "S", title: "（S）篡改配方及原料规则 Recipe & Ingredient Tampering", detail: "擅自替换原料、错加/漏加配料，或备料操作严重偏离SOP", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C3", type: "S", title: "（S）设备操作错误 Equipment Operation Errors", detail: "定量机出料不准、加热器温度严重偏差、萃茶机操作不规范", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C4", type: "S", title: "（S）饮品加料标准 Beverage Topping Standards", detail: "按SOP顺序与克重加料，使用指定量勺", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C5", type: "S", title: "（S）饮品雪克台标准 Shaking Station Standards", detail: "平视量杯刻度，冰量符合标准，出杯前按要求搅拌", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C6", type: "M", title: "（M）小料相关检查 Topping Quality Control", detail: "小料在赏味期内，分装物料排水充分，小料无结块", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C7", type: "M", title: "（M）预制流程 Pre-preparation Procedures", detail: "茶汤萃取、血糯米/芋泥/黑糖珍珠煮制符合标准", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C8", type: "M", title: "（M）解冻流程 Thawing Procedures", detail: "禁止热水解冻，解冻水果浸泡时间符合标准", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C9", type: "N", title: "饮品抽检饮品 Beverage Quality Inspection", detail: "随机抽购至少1杯TOP品项饮品，测试口感与外观", defaultDeduction: 0, defaultRemark: "" }
+        ]
+      },
+      {
+        sectionId: "D",
+        sectionTitle: "Section D: 系统执行与其它 System Execution & Others",
+        maxScore: 18,
+        items: [
+          { id: "D1", type: "S", title: "（S）证照与健康证要求 License & Certificates", detail: "营业执照及员工健康证齐备有效且涵盖现场经营范围", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D2", type: "M", title: "（M）消杀报告 Sanitization Reports", detail: "每月按时开展专业消杀并保留消杀报告", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D3", type: "M", title: "（M）巡店追踪与整改 Improvement Tracking", detail: "上一期巡店问题整改率≥90%，监控摄像头保持在线", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D4", type: "N", title: "系统工具执行 System Tool Execution", detail: "员工掌握知识库路径，酷店掌打卡完成率100%", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D5", type: "N", title: "门店问题与需求沟通 Issue Communication", detail: "与店长或加盟商进行深度沟通，了解经营困难", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D6", type: "N", title: "表扬与亮点提取 Recognition & Highlights", detail: "记录门店优秀做法并提取推广", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D7", type: "N", title: "辅导与行动计划 Action Plan Guidance", detail: "针对主要扣分项制定整改计划并约定复查时间", defaultDeduction: 0, defaultRemark: "" }
+        ]
+      }
+    ];
+
+    // Photo Storage Object keyed by item id
+    const itemPhotos = {};
+
+    // Render Checklist UI
+    function renderChecklist() {
+      const container = document.getElementById('checklistContainer');
+      container.innerHTML = '';
+
+      auditData.forEach(section => {
+        const sectionCard = document.createElement('div');
+        sectionCard.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden card-shadow";
+
+        let sectionHeaderHTML = `
+          <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
+            <h3 class="font-bold text-sm md:text-base">${section.sectionTitle}</h3>
+            <span class="text-xs bg-slate-700 px-2.5 py-1 rounded-full text-slate-300">最高: ${section.maxScore}分</span>
+          </div>
+          <div class="divide-y divide-slate-100">
+        `;
+
+        let itemsHTML = '';
+        section.items.forEach(item => {
+          // Determine badge color
+          let badgeClass = "bg-slate-200 text-slate-700";
+          if (item.type === "SS") badgeClass = "bg-rose-600 text-white font-bold";
+          else if (item.type === "S") badgeClass = "bg-amber-500 text-slate-900 font-bold";
+          else if (item.type === "M") badgeClass = "bg-blue-100 text-blue-800 font-semibold";
+
+          itemsHTML += `
+            <div class="p-3 md:p-4 hover:bg-slate-50 transition page-break-inside-avoid" id="card-${item.id}">
+              <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
+                
+                <!-- Left: Title & Detail -->
+                <div class="flex-1 space-y-1">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-xs px-2 py-0.5 rounded ${badgeClass}">${item.id}</span>
+                    <h4 class="font-bold text-slate-800 text-sm md:text-base">${item.title}</h4>
+                  </div>
+                  <p class="text-xs text-slate-500 whitespace-pre-line leading-relaxed pl-1">${item.detail}</p>
+                </div>
+
+                <!-- Right: Deduction Input -->
+                <div class="flex items-center space-x-2 self-start md:self-center bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+                  <span class="text-xs font-medium text-slate-600">扣分:</span>
+                  <input type="number" id="score-${item.id}" value="${item.defaultDeduction}" max="0" step="1" 
+                         onchange="calculateScore()" 
+                         class="w-16 text-center font-bold text-rose-600 border border-slate-300 rounded p-1 text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                  <span class="text-xs text-slate-400">分</span>
+                </div>
+
+              </div>
+
+              <!-- Problem Remark Input -->
+              <div class="mt-3">
+                <input type="text" id="remark-${item.id}" value="${item.defaultRemark}" placeholder="填写具体违规现象 / 问题描述..." 
+                       class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+              </div>
+
+              <!-- Photo Upload Section -->
+              <div class="mt-2.5">
+                <div class="flex items-center space-x-2 no-print">
+                  <label for="photo-${item.id}" class="cursor-pointer text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md font-medium border border-indigo-200 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>拍照 / 上传图片</span>
+                  </label>
+                  <input type="file" id="photo-${item.id}" accept="image/*" multiple onchange="handlePhotoUpload('${item.id}', this)" class="hidden">
+                  <span class="text-[11px] text-slate-400">（支持现场拍照上传）</span>
+                </div>
+
+                <!-- Photo Thumbnails Grid -->
+                <div id="photos-container-${item.id}" class="flex flex-wrap gap-2 mt-2"></div>
+              </div>
+
+            </div>
+          `;
+        });
+
+        sectionCard.innerHTML = sectionHeaderHTML + itemsHTML + '</div>';
+        container.appendChild(sectionCard);
+      });
+
+      calculateScore();
+    }
+
+    // Photo Upload Handler
+    function handlePhotoUpload(itemId, input) {
+      if (!input.files || input.files.length === 0) return;
+
+      if (!itemPhotos[itemId]) itemPhotos[itemId] = [];
+
+      Array.from(input.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          itemPhotos[itemId].push(e.target.result);
+          renderPhotos(itemId);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      input.value = ''; // reset
+    }
+
+    // Render Photos Thumbnails
+    function renderPhotos(itemId) {
+      const container = document.getElementById(`photos-container-${itemId}`);
+      container.innerHTML = '';
+
+      if (!itemPhotos[itemId] || itemPhotos[itemId].length === 0) return;
+
+      itemPhotos[itemId].forEach((src, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = "relative group w-16 h-16 rounded-lg overflow-hidden border border-slate-300 shadow-sm";
+
+        wrapper.innerHTML = `
+          <img src="${src}" class="w-full h-full object-cover">
+          <button onclick="deletePhoto('${itemId}', ${idx})" class="photo-delete-btn absolute top-0.5 right-0.5 bg-rose-600 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center opacity-80 hover:opacity-100 transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+
+        container.appendChild(wrapper);
+      });
+    }
+
+    // Delete Photo
+    function deletePhoto(itemId, idx) {
+      if (itemPhotos[itemId]) {
+        itemPhotos[itemId].splice(idx, 1);
+        renderPhotos(itemId);
+      }
+    }
+
+    // Main Score Calculation Logic
+    function calculateScore() {
+      let baseMaxScore = 150;
+      let totalDeductions = 0;
+      let sViolationCount = 0;
+      let ssViolationCount = 0;
+
+      auditData.forEach(section => {
+        section.items.forEach(item => {
+          const input = document.getElementById(`score-${item.id}`);
+          if (input) {
+            let val = parseInt(input.value) || 0;
+            if (val > 0) val = 0; // ensure negative or 0
+            
+            if (val < 0) {
+              totalDeductions += Math.abs(val);
+              if (item.type === 'S') sViolationCount++;
+              if (item.type === 'SS') ssViolationCount++;
+            }
+          }
+        });
+      });
+
+      // Handle S Penalty Base deduction (-50 if toggled & S violation exists)
+      const enableSPenalty = document.getElementById('sPenaltyToggle').checked;
+      let effectiveMaxScore = baseMaxScore;
+
+      if (enableSPenalty && sViolationCount > 0) {
+        effectiveMaxScore = 100; // Base reduced to 100
+      }
+
+      let finalScore = effectiveMaxScore - totalDeductions;
+      if (finalScore < 0) finalScore = 0;
+
+      // Update UI Header Stats
+      document.getElementById('effectiveMaxScore').innerText = effectiveMaxScore;
+      document.getElementById('totalScoreDisplay').innerText = finalScore;
+      document.getElementById('sViolationCount').innerText = `${sViolationCount} 项`;
+      document.getElementById('ssViolationCount').innerText = `${ssViolationCount} 项`;
+
+      // Grade Calculation
+      let grade = "Grade A";
+      let badgeClass = "bg-emerald-500 text-white";
+
+      if (ssViolationCount > 0 || finalScore <= 70) {
+        grade = "Grade D (极高风险)";
+        badgeClass = "bg-rose-600 text-white";
+      } else if (sViolationCount > 0 || (finalScore >= 71 && finalScore <= 100)) {
+        grade = "Grade C (高风险)";
+        badgeClass = "bg-amber-500 text-slate-900 font-bold";
+      } else if (finalScore >= 101 && finalScore <= 129) {
+        grade = "Grade B (中风险)";
+        badgeClass = "bg-blue-600 text-white";
+      } else {
+        grade = "Grade A (低风险)";
+        badgeClass = "bg-emerald-500 text-white";
+      }
+
+      const gradeBadge = document.getElementById('gradeBadge');
+      gradeBadge.innerText = grade;
+      gradeBadge.className = `inline-block px-2 py-0.5 text-xs font-bold rounded ${badgeClass}`;
+
+      // Update Active Risk Box Highlight
+      updateGradeBoxHighlight(grade);
+    }
+
+    function updateGradeBoxHighlight(grade) {
+      ['A', 'B', 'C', 'D'].forEach(letter => {
+        const box = document.getElementById(`gradeBox${letter}`);
+        if (box) box.classList.remove('ring-2', 'ring-indigo-600', 'scale-105');
+      });
+
+      if (grade.includes('Grade A')) document.getElementById('gradeBoxA')?.classList.add('ring-2', 'ring-indigo-600');
+      else if (grade.includes('Grade B')) document.getElementById('gradeBoxB')?.classList.add('ring-2', 'ring-indigo-600');
+      else if (grade.includes('Grade C')) document.getElementById('gradeBoxC')?.classList.add('ring-2', 'ring-indigo-600');
+      else if (grade.includes('Grade D')) document.getElementById('gradeBoxD')?.classList.add('ring-2', 'ring-indigo-600');
+    }
+
+    // Reset Form
+    function resetForm() {
+      if (confirm('确定要重置所有已填写的稽核数据吗？')) {
+        auditData.forEach(section => {
+          section.items.forEach(item => {
+            const scoreInput = document.getElementById(`score-${item.id}`);
+            const remarkInput = document.getElementById(`remark-${item.id}`);
+            if (scoreInput) scoreInput.value = item.defaultDeduction;
+            if (remarkInput) remarkInput.value = item.defaultRemark;
+            itemPhotos[item.id] = [];
+            renderPhotos(item.id);
+          });
+        });
+        calculateScore();
+      }
+    }
+
+    // Export to PDF / Print Function
+    function exportToPDF() {
+      window.print();
+    }
+
+    // Initialize on load
+    window.onload = function() {
+      renderChecklist();
+    };
+  </script>
+</body>
+</html>
