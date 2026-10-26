@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>海外快速访店稽核系统 V1.3</title>
+  <title>海外快速访店稽核系统 V1.4</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -83,7 +83,7 @@
         </div>
         <div>
           <h1 class="text-base md:text-lg font-bold leading-tight">海外快速访店稽核系统</h1>
-          <p class="text-xs text-slate-400">V1.3 完整35项标准版</p>
+          <p class="text-xs text-slate-400">V1.4 完整35项标准版（含单项满分显示与实时计分）</p>
         </div>
       </div>
       
@@ -207,21 +207,21 @@
     // Set default audit date to today
     document.getElementById('auditDate').valueAsDate = new Date();
 
-    // 35 Audit Items Data Definition
+    // 35 Audit Items Data Definition (含单项满分 itemMax)
     const auditData = [
       {
         sectionId: "A",
         sectionTitle: "Section A: 顾客体验标准 Customer Experience Standards",
         maxScore: 36,
         items: [
-          { id: "A1", type: "S", title: "（S)严重卫生不良与凌乱 Severe Poor Sanitation", detail: "营业期间维持门店清洁\n1. 顾客可见区域存在垃圾、食物残渣、积水或异味\n2. 操作区原料与工具堆放严重无序", defaultDeduction: 0, defaultRemark: "" },
-          { id: "A2", type: "S", title: "（S)核心体验 Core Experience", detail: "1. 顾客在吧台等待超过2分钟无人接待\n2. 播放未经品牌授权的音乐或广告", defaultDeduction: 0, defaultRemark: "" },
-          { id: "A3", type: "S", title: "（S)营销与新品活动标准 Marketing & New Product Campaign", detail: "总部当前统一营销活动必须全面执行，不得擅自下架或不执行", defaultDeduction: 0, defaultRemark: "" },
-          { id: "A4", type: "M", title: "（M）门头招牌与宣传物料标准 Store Signage & Materials", detail: "1. 主门头、侧招、灯箱不符合品牌要求\n2. 室内外张贴非标宣传物料", defaultDeduction: 0, defaultRemark: "" },
-          { id: "A5", type: "M", title: "（M)吧台清洁标准 Bar Counter Cleanliness", detail: "吧台台面及设备保持干净无渍，地面无明显污垢或积水", defaultDeduction: -5, defaultRemark: "staff drink is on the bar" },
-          { id: "A6", type: "M", title: "（M)顾客服务标准 Customer Service Standards", detail: "1. 进店欢迎语与离店问候语执行\n2. 员工仪容仪表（工作服、口罩、发网完整规范）", defaultDeduction: -5, defaultRemark: "nobody said Thank you; didn't wear mask&uniform" },
-          { id: "A7", type: "N", title: "固定设施与大门配件标准 Fixed Facilities", detail: "固定设施完好，无损坏、剥落、生锈或松动", defaultDeduction: 0, defaultRemark: "" },
-          { id: "A8", type: "N", title: "过季物料按要求下架撤除 Off-season Materials", detail: "过季联名商品及物料及时撤除，不陈列于顾客可见区", defaultDeduction: 0, defaultRemark: "" }
+          { id: "A1", type: "S", itemMax: 5, title: "（S)严重卫生不良与凌乱 Severe Poor Sanitation", detail: "营业期间维持门店清洁\n1. 顾客可见区域存在垃圾、食物残渣、积水或异味\n2. 操作区原料与工具堆放严重无序", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A2", type: "S", itemMax: 5, title: "（S)核心体验 Core Experience", detail: "1. 顾客在吧台等待超过2分钟无人接待\n2. 播放未经品牌授权的音乐或广告", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A3", type: "S", itemMax: 5, title: "（S)营销与新品活动标准 Marketing & New Product Campaign", detail: "总部当前统一营销活动必须全面执行，不得擅自下架或不执行", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A4", type: "M", itemMax: 4, title: "（M）门头招牌与宣传物料标准 Store Signage & Materials", detail: "1. 主门头、侧招、灯箱不符合品牌要求\n2. 室内外张贴非标宣传物料", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A5", type: "M", itemMax: 5, title: "（M)吧台清洁标准 Bar Counter Cleanliness", detail: "吧台台面及设备保持干净无渍，地面无明显污垢或积水", defaultDeduction: -5, defaultRemark: "staff drink is on the bar" },
+          { id: "A6", type: "M", itemMax: 5, title: "（M)顾客服务标准 Customer Service Standards", detail: "1. 进店欢迎语与离店问候语执行\n2. 员工仪容仪表（工作服、口罩、发网完整规范）", defaultDeduction: -5, defaultRemark: "nobody said Thank you; didn't wear mask&uniform" },
+          { id: "A7", type: "N", itemMax: 4, title: "固定设施与大门配件标准 Fixed Facilities", detail: "固定设施完好，无损坏、剥落、生锈或松动", defaultDeduction: 0, defaultRemark: "" },
+          { id: "A8", type: "N", itemMax: 3, title: "过季物料按要求下架撤除 Off-season Materials", detail: "过季联名商品及物料及时撤除，不陈列于顾客可见区", defaultDeduction: 0, defaultRemark: "" }
         ]
       },
       {
@@ -229,17 +229,17 @@
         sectionTitle: "Section B: 食品安全标准 Food Safety Standards",
         maxScore: 53,
         items: [
-          { id: "B1", type: "S", title: "（S）净水系统过期 Expired Water Filtration System", detail: "未按要求更换净水系统滤芯（过期或缺少定期清洗记录）", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B2", type: "M", title: "（M）化学品与清洁用具标准 Chemical & Sanitizing Tools", detail: "1. 化学品单独存放\n2. 按要求配制消毒液\n3. 抹布分类管理", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B3", type: "M", title: "（M）洗手区 QSC 标准 Hand-Washing Area QSC", detail: "烘手器正常，配备充足洗手液，洗手池专池专用", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B4", type: "M", title: "（M）操作区卫生标准 Operation Area Sanitation", detail: "墙面、天花板、灭蝇灯、垃圾桶及地面无积垢积水", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B5", type: "M", title: "（M）食品设备与储存标准 Food Equipment & Storage", detail: "食品加工设备内外表面无污垢，冷藏冷冻食材常温放置不超过15分钟", defaultDeduction: -1, defaultRemark: "sealing machine is dirty, need to clean" },
-          { id: "B6", type: "M", title: "（M）制冰机 QSC 标准 Ice-Maker QSC Standards", detail: "制冰机盖及时关闭，冰铲单独存放，水槽内壁干净", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B7", type: "M", title: "（M）奶茶机/原料桶/冰箱 QSC 标准 Equipment & Ingredients", detail: "1. 设备设定温度符合标准(>8℃需注意)\n2. 效期标签正确张贴，原料在最佳赏味期内", defaultDeduction: -5, defaultRemark: "dahongpao tea, d milk, grape rose juice expired" },
-          { id: "B8", type: "M", title: "（M）煮制台 QSC 标准 Cooking Station QSC", detail: "开封常温原料在保质期内，搅拌器及工具清洁无垢", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B9", type: "M", title: "（M）水果台 QSC 标准 Fruit Station QSC", detail: "工具妥善存放，水龙头及水槽无顽固污渍，按SOP消毒水果", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B10", type: "M", title: "（M）冷藏原料储存标准 Refrigerated Storage", detail: "冷藏温度≤8℃，出风口及封条无霉变，生熟分类存放", defaultDeduction: 0, defaultRemark: "" },
-          { id: "B11", type: "M", title: "（M）冷冻原料储存标准 Frozen Storage", detail: "冷冻温度≤-12℃，结霜不超过1cm，无反复解冻现象", defaultDeduction: 0, defaultRemark: "" }
+          { id: "B1", type: "S", itemMax: 5, title: "（S）净水系统过期 Expired Water Filtration System", detail: "未按要求更换净水系统滤芯（过期或缺少定期清洗记录）", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B2", type: "M", itemMax: 5, title: "（M）化学品与清洁用具标准 Chemical & Sanitizing Tools", detail: "1. 化学品单独存放\n2. 按要求配制消毒液\n3. 抹布分类管理", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B3", type: "M", itemMax: 4, title: "（M）洗手区 QSC 标准 Hand-Washing Area QSC", detail: "烘手器正常，配备充足洗手液，洗手池专池专用", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B4", type: "M", itemMax: 5, title: "（M）操作区卫生标准 Operation Area Sanitation", detail: "墙面、天花板、灭蝇灯、垃圾桶及地面无积垢积水", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B5", type: "M", itemMax: 5, title: "（M）食品设备与储存标准 Food Equipment & Storage", detail: "食品加工设备内外表面无污垢，冷藏冷冻食材常温放置不超过15分钟", defaultDeduction: -1, defaultRemark: "sealing machine is dirty, need to clean" },
+          { id: "B6", type: "M", itemMax: 4, title: "（M）制冰机 QSC 标准 Ice-Maker QSC Standards", detail: "制冰机盖及时关闭，冰铲单独存放，水槽内壁干净", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B7", type: "M", itemMax: 5, title: "（M）奶茶机/原料桶/冰箱 QSC 标准 Equipment & Ingredients", detail: "1. 设备设定温度符合标准(>8℃需注意)\n2. 效期标签正确张贴，原料在最佳赏味期内", defaultDeduction: -5, defaultRemark: "dahongpao tea, d milk, grape rose juice expired" },
+          { id: "B8", type: "M", itemMax: 5, title: "（M）煮制台 QSC 标准 Cooking Station QSC", detail: "开封常温原料在保质期内，搅拌器及工具清洁无垢", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B9", type: "M", itemMax: 5, title: "（M）水果台 QSC 标准 Fruit Station QSC", detail: "工具妥善存放，水龙头及水槽无顽固污渍，按SOP消毒水果", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B10", type: "M", itemMax: 5, title: "（M）冷藏原料储存标准 Refrigerated Storage", detail: "冷藏温度≤8℃，出风口及封条无霉变，生熟分类存放", defaultDeduction: 0, defaultRemark: "" },
+          { id: "B11", type: "M", itemMax: 5, title: "（M）冷冻原料储存标准 Frozen Storage", detail: "冷冻温度≤-12℃，结霜不超过1cm，无反复解冻现象", defaultDeduction: 0, defaultRemark: "" }
         ]
       },
       {
@@ -247,15 +247,15 @@
         sectionTitle: "Section C: 产品品质标准 Product Quality Standards",
         maxScore: 43,
         items: [
-          { id: "C1", type: "SS", title: "（SS）擅自采购非品牌授权原料/物料 Unauthorized Materials", detail: "门店发现未经品牌授权的原物料或包装物料（一票否决项）", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C2", type: "S", title: "（S）篡改配方及原料规则 Recipe & Ingredient Tampering", detail: "擅自替换原料、错加/漏加配料，或备料操作严重偏离SOP", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C3", type: "S", title: "（S）设备操作错误 Equipment Operation Errors", detail: "定量机出料不准、加热器温度严重偏差、萃茶机操作不规范", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C4", type: "S", title: "（S）饮品加料标准 Beverage Topping Standards", detail: "按SOP顺序与克重加料，使用指定量勺", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C5", type: "S", title: "（S）饮品雪克台标准 Shaking Station Standards", detail: "平视量杯刻度，冰量符合标准，出杯前按要求搅拌", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C6", type: "M", title: "（M）小料相关检查 Topping Quality Control", detail: "小料在赏味期内，分装物料排水充分，小料无结块", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C7", type: "M", title: "（M）预制流程 Pre-preparation Procedures", detail: "茶汤萃取、血糯米/芋泥/黑糖珍珠煮制符合标准", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C8", type: "M", title: "（M）解冻流程 Thawing Procedures", detail: "禁止热水解冻，解冻水果浸泡时间符合标准", defaultDeduction: 0, defaultRemark: "" },
-          { id: "C9", type: "N", title: "饮品抽检饮品 Beverage Quality Inspection", detail: "随机抽购至少1杯TOP品项饮品，测试口感与外观", defaultDeduction: 0, defaultRemark: "" }
+          { id: "C1", type: "SS", itemMax: 5, title: "（SS）擅自采购非品牌授权原料/物料 Unauthorized Materials", detail: "门店发现未经品牌授权的原物料或包装物料（一票否决项）", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C2", type: "S", itemMax: 5, title: "（S）篡改配方及原料规则 Recipe & Ingredient Tampering", detail: "擅自替换原料、错加/漏加配料，或备料操作严重偏离SOP", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C3", type: "S", itemMax: 5, title: "（S）设备操作错误 Equipment Operation Errors", detail: "定量机出料不准、加热器温度严重偏差、萃茶机操作不规范", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C4", type: "S", itemMax: 5, title: "（S）饮品加料标准 Beverage Topping Standards", detail: "按SOP顺序与克重加料，使用指定量勺", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C5", type: "S", itemMax: 5, title: "（S）饮品雪克台标准 Shaking Station Standards", detail: "平视量杯刻度，冰量符合标准，出杯前按要求搅拌", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C6", type: "M", itemMax: 5, title: "（M）小料相关检查 Topping Quality Control", detail: "小料在赏味期内，分装物料排水充分，小料无结块", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C7", type: "M", itemMax: 5, title: "（M）预制流程 Pre-preparation Procedures", detail: "茶汤萃取、血糯米/芋泥/黑糖珍珠煮制符合标准", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C8", type: "M", itemMax: 4, title: "（M）解冻流程 Thawing Procedures", detail: "禁止热水解冻，解冻水果浸泡时间符合标准", defaultDeduction: 0, defaultRemark: "" },
+          { id: "C9", type: "N", itemMax: 4, title: "饮品抽检饮品 Beverage Quality Inspection", detail: "随机抽购至少1杯TOP品项饮品，测试口感与外观", defaultDeduction: 0, defaultRemark: "" }
         ]
       },
       {
@@ -263,13 +263,13 @@
         sectionTitle: "Section D: 系统执行与其它 System Execution & Others",
         maxScore: 18,
         items: [
-          { id: "D1", type: "S", title: "（S）证照与健康证要求 License & Certificates", detail: "营业执照及员工健康证齐备有效且涵盖现场经营范围", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D2", type: "M", title: "（M）消杀报告 Sanitization Reports", detail: "每月按时开展专业消杀并保留消杀报告", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D3", type: "M", title: "（M）巡店追踪与整改 Improvement Tracking", detail: "上一期巡店问题整改率≥90%，监控摄像头保持在线", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D4", type: "N", title: "系统工具执行 System Tool Execution", detail: "员工掌握知识库路径，酷店掌打卡完成率100%", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D5", type: "N", title: "门店问题与需求沟通 Issue Communication", detail: "与店长或加盟商进行深度沟通，了解经营困难", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D6", type: "N", title: "表扬与亮点提取 Recognition & Highlights", detail: "记录门店优秀做法并提取推广", defaultDeduction: 0, defaultRemark: "" },
-          { id: "D7", type: "N", title: "辅导与行动计划 Action Plan Guidance", detail: "针对主要扣分项制定整改计划并约定复查时间", defaultDeduction: 0, defaultRemark: "" }
+          { id: "D1", type: "S", itemMax: 3, title: "（S）证照与健康证要求 License & Certificates", detail: "营业执照及员工健康证齐备有效且涵盖现场经营范围", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D2", type: "M", itemMax: 3, title: "（M）消杀报告 Sanitization Reports", detail: "每月按时开展专业消杀并保留消杀报告", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D3", type: "M", itemMax: 3, title: "（M）巡店追踪与整改 Improvement Tracking", detail: "上一期巡店问题整改率≥90%，监控摄像头保持在线", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D4", type: "N", itemMax: 2, title: "系统工具执行 System Tool Execution", detail: "员工掌握知识库路径，酷店掌打卡完成率100%", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D5", type: "N", itemMax: 2, title: "门店问题与需求沟通 Issue Communication", detail: "与店长或加盟商进行深度沟通，了解经营困难", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D6", type: "N", itemMax: 2, title: "表扬与亮点提取 Recognition & Highlights", detail: "记录门店优秀做法并提取推广", defaultDeduction: 0, defaultRemark: "" },
+          { id: "D7", type: "N", itemMax: 3, title: "辅导与行动计划 Action Plan Guidance", detail: "针对主要扣分项制定整改计划并约定复查时间", defaultDeduction: 0, defaultRemark: "" }
         ]
       }
     ];
@@ -289,14 +289,13 @@
         let sectionHeaderHTML = `
           <div class="bg-slate-800 text-white px-4 py-3 flex items-center justify-between">
             <h3 class="font-bold text-sm md:text-base">${section.sectionTitle}</h3>
-            <span class="text-xs bg-slate-700 px-2.5 py-1 rounded-full text-slate-300">最高: ${section.maxScore}分</span>
+            <span class="text-xs bg-slate-700 px-2.5 py-1 rounded-full text-slate-300">大类满分: ${section.maxScore}分</span>
           </div>
           <div class="divide-y divide-slate-100">
         `;
 
         let itemsHTML = '';
         section.items.forEach(item => {
-          // Determine badge color
           let badgeClass = "bg-slate-200 text-slate-700";
           if (item.type === "SS") badgeClass = "bg-rose-600 text-white font-bold";
           else if (item.type === "S") badgeClass = "bg-amber-500 text-slate-900 font-bold";
@@ -311,15 +310,17 @@
                   <div class="flex items-center space-x-2">
                     <span class="text-xs px-2 py-0.5 rounded ${badgeClass}">${item.id}</span>
                     <h4 class="font-bold text-slate-800 text-sm md:text-base">${item.title}</h4>
+                    <span class="text-[11px] text-slate-400 font-normal bg-slate-100 px-1.5 py-0.5 rounded">满分: ${item.itemMax}分</span>
                   </div>
                   <p class="text-xs text-slate-500 whitespace-pre-line leading-relaxed pl-1">${item.detail}</p>
                 </div>
 
-                <!-- Right: Deduction Input -->
+                <!-- Right: Deduction Input (Real-time calculation oninput) -->
                 <div class="flex items-center space-x-2 self-start md:self-center bg-slate-100 p-1.5 rounded-lg border border-slate-200">
                   <span class="text-xs font-medium text-slate-600">扣分:</span>
-                  <input type="number" id="score-${item.id}" value="${item.defaultDeduction}" max="0" step="1" 
-                         onchange="calculateScore()" 
+                  <input type="number" id="score-${item.id}" value="${item.defaultDeduction}" step="1" 
+                         oninput="calculateScore()" onchange="calculateScore()" 
+                         placeholder="0"
                          class="w-16 text-center font-bold text-rose-600 border border-slate-300 rounded p-1 text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
                   <span class="text-xs text-slate-400">分</span>
                 </div>
@@ -361,7 +362,6 @@
     // Photo Upload Handler
     function handlePhotoUpload(itemId, input) {
       if (!input.files || input.files.length === 0) return;
-
       if (!itemPhotos[itemId]) itemPhotos[itemId] = [];
 
       Array.from(input.files).forEach(file => {
@@ -373,7 +373,7 @@
         reader.readAsDataURL(file);
       });
 
-      input.value = ''; // reset
+      input.value = ''; 
     }
 
     // Render Photos Thumbnails
@@ -417,11 +417,11 @@
         section.items.forEach(item => {
           const input = document.getElementById(`score-${item.id}`);
           if (input) {
-            let val = parseInt(input.value) || 0;
-            if (val > 0) val = 0; // ensure negative or 0
+            let val = parseFloat(input.value) || 0;
+            let deductionAmount = Math.abs(val); // 兼容正负数，例如填 5 或 -5 都算作扣 5 分
             
-            if (val < 0) {
-              totalDeductions += Math.abs(val);
+            if (deductionAmount > 0) {
+              totalDeductions += deductionAmount;
               if (item.type === 'S') sViolationCount++;
               if (item.type === 'SS') ssViolationCount++;
             }
@@ -429,24 +429,21 @@
         });
       });
 
-      // Handle S Penalty Base deduction (-50 if toggled & S violation exists)
       const enableSPenalty = document.getElementById('sPenaltyToggle').checked;
       let effectiveMaxScore = baseMaxScore;
 
       if (enableSPenalty && sViolationCount > 0) {
-        effectiveMaxScore = 100; // Base reduced to 100
+        effectiveMaxScore = 100; // 有S项违规，起步满分自动变为100
       }
 
       let finalScore = effectiveMaxScore - totalDeductions;
       if (finalScore < 0) finalScore = 0;
 
-      // Update UI Header Stats
       document.getElementById('effectiveMaxScore').innerText = effectiveMaxScore;
       document.getElementById('totalScoreDisplay').innerText = finalScore;
       document.getElementById('sViolationCount').innerText = `${sViolationCount} 项`;
       document.getElementById('ssViolationCount').innerText = `${ssViolationCount} 项`;
 
-      // Grade Calculation
       let grade = "Grade A";
       let badgeClass = "bg-emerald-500 text-white";
 
@@ -468,7 +465,6 @@
       gradeBadge.innerText = grade;
       gradeBadge.className = `inline-block px-2 py-0.5 text-xs font-bold rounded ${badgeClass}`;
 
-      // Update Active Risk Box Highlight
       updateGradeBoxHighlight(grade);
     }
 
